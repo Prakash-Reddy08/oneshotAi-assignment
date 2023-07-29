@@ -6,7 +6,13 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-  // Add other relevant user information if needed
+  otp: {
+    type: String,
+  },
+  refreshToken: {
+    type: String,
+    require: true
+  }
 });
 
 module.exports = mongoose.model('User', userSchema);

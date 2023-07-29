@@ -1,12 +1,9 @@
-export interface User {
-  email: string;
-  userId: number;
-}
-
 export interface RootState {
   auth: {
     isLoggedIn: boolean;
-    user: User | null;
+    email: string | null;
+    id: string | null;
+    accessToken: string | null;
   };
 }
 export interface Booking {

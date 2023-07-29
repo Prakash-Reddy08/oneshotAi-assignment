@@ -5,7 +5,6 @@ exports.getBookedSlots = async (req, res) => {
     try {
         const bookedSlots = {};
         const bookings = await Appointment.find({});
-
         bookings.forEach((booking) => {
             const date = booking.date.toISOString().slice(0, 10);
             if (!bookedSlots[date]) {
@@ -25,7 +24,9 @@ exports.getBookedSlots = async (req, res) => {
 exports.bookSlot = async (req, res) => {
     try {
         const { date, timeSlot, userId } = req.body;
-
+        if (!date || !timeSlot || !userId) {
+            return res.status(400).json({ error: "Something Went Wrong" })
+        }
         const existingBooking = await Appointment.findOne({ date, timeSlot });
         if (existingBooking) {
             return res.status(400).json({ error: 'Slot is already booked' });

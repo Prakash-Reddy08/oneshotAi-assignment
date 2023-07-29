@@ -12,6 +12,7 @@ const appointmentSchema = new mongoose.Schema({
     bookedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
+        required: true
     },
 });
 

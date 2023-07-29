@@ -1,24 +1,34 @@
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../services/types";
-import { Link, useNavigate, Outlet } from "react-router-dom";
+import { Link, useNavigate, useLocation, Outlet } from "react-router-dom";
 import { styled } from "styled-components";
+
 const Home = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { isLoggedIn } = useSelector((state: RootState) => state.auth);
-  useEffect(() => {
-    if (isLoggedIn) {
-      navigate("/login");
-    }
-  }, [isLoggedIn, navigate]);
 
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate("/login");
+    } else if (location.pathname === "/") {
+      navigate("/calendar");
+    }
+  }, [isLoggedIn, location.pathname, navigate]);
+  if (!isLoggedIn) return <></>;
   return (
     <HomeContainer>
       <NavBar>
-        <NavLink to="/calendar" $selected>
+        <NavLink to="/calendar" $selected={location.pathname === "/calendar"}>
           Calendar
         </NavLink>
-        <NavLink to="/bookings">Bookings</NavLink>
+        <NavLink
+          to="/appointments"
+          $selected={location.pathname === "/appointments"}
+        >
+          Bookings
+        </NavLink>
       </NavBar>
       <Outlet />
     </HomeContainer>

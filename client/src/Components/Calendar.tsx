@@ -2,16 +2,18 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import api from "../services/api";
+import { apiPrivate } from "../services/api";
+import { useSelector } from "react-redux";
+import { RootState } from "../services/types";
 
 const Calendar: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [bookedSlots, setBookedSlots] = useState<{ [date: string]: string[] }>(
     {}
   );
-
+  const { id } = useSelector((state: RootState) => state.auth);
   useEffect(() => {
-    api
+    apiPrivate
       .get("api/appointments/booked-slots")
       .then((response) => {
         setBookedSlots(response.data);
@@ -40,10 +42,11 @@ const Calendar: React.FC = () => {
       selectedDate &&
       !bookedSlots[selectedDate.toISOString().slice(0, 10)]?.includes(timeSlot)
     ) {
-      api
+      apiPrivate
         .post("api/appointments/book-slot", {
           date: selectedDate.toISOString().slice(0, 10),
           timeSlot,
+          userId: id,
         })
         .then(() => {
           setBookedSlots((prevBookedSlots) => {

@@ -6,7 +6,8 @@ import Store from "./Store";
 import Home from "./Pages/Home";
 import Appointments from "./Components/Appointments";
 import Calendar from "./Components/Calendar";
-
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const App: React.FC = () => {
   return (
     <Provider store={Store}>
@@ -19,6 +20,7 @@ const App: React.FC = () => {
           </Route>
         </Routes>
       </BrowserRouter>
+      <ToastContainer />
     </Provider>
   );
 };
