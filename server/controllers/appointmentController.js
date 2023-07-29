@@ -41,3 +41,35 @@ exports.bookSlot = async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 };
+
+exports.getUserBookings = async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        const bookings = await Appointment.find({ bookedBy: userId });
+
+        res.json(bookings);
+    } catch (err) {
+        console.error('Error fetching user bookings:', err);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+
+exports.cancelBooking = async (req, res) => {
+    try {
+        const { bookingId } = req.params;
+
+        const booking = await Appointment.findById(bookingId);
+
+        if (!booking) {
+            return res.status(404).json({ error: 'Booking not found' });
+        }
+
+        await Appointment.deleteOne({ _id: bookingId });
+
+        res.json({ message: 'Booking cancelled successfully' });
+    } catch (err) {
+        console.error('Error cancelling booking:', err);
+        res.status(500).json({ error: 'Server error' });
+    }
+};

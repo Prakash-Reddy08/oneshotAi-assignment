@@ -5,6 +5,8 @@ import "react-datepicker/dist/react-datepicker.css";
 import { apiPrivate } from "../services/api";
 import { useSelector } from "react-redux";
 import { RootState } from "../services/types";
+import { formatTime } from "../services/helper";
+import { toast } from "react-toastify";
 
 const Calendar: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -42,6 +44,7 @@ const Calendar: React.FC = () => {
       selectedDate &&
       !bookedSlots[selectedDate.toISOString().slice(0, 10)]?.includes(timeSlot)
     ) {
+      const toastId = toast.loading("Loading...");
       apiPrivate
         .post("api/appointments/book-slot", {
           date: selectedDate.toISOString().slice(0, 10),
@@ -60,6 +63,24 @@ const Calendar: React.FC = () => {
             };
             return updatedBookedSlots;
           });
+          toast.update(toastId, {
+            render: "Booking Successful",
+            type: "success",
+            isLoading: false,
+            autoClose: 3000,
+            closeButton: true,
+            draggable: true,
+          });
+        })
+        .catch((err) => {
+          toast.update(toastId, {
+            render: err.response.data.error || "Something went wrong",
+            type: "error",
+            isLoading: false,
+            autoClose: 3000,
+            closeButton: true,
+            draggable: true,
+          });
         });
       console.log("Booking:", selectedDate, timeSlot);
     }
@@ -70,17 +91,6 @@ const Calendar: React.FC = () => {
     const minute = i % 2 === 0 ? "00" : "30";
     return `${hour}:${minute}`;
   });
-
-  const formatTime = (timeSlot: string): string => {
-    const [hour, minute] = timeSlot.split(":");
-    const time = new Date();
-    time.setHours(parseInt(hour, 10), parseInt(minute, 10));
-    return time.toLocaleString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    });
-  };
 
   const isDateBooked = selectedDate
     ? availableTimeSlots.every((timeSlot) => {

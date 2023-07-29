@@ -66,7 +66,6 @@ const Login: React.FC = () => {
         const { id, token, email } = response.data;
         dispatch(loginSuccess({ token, email, id }));
         navigate("/calendar");
-        console.log(token, email);
       })
       .catch((err) => {
         toast.error(err.response.data.error);

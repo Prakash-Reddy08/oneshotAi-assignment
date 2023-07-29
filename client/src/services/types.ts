@@ -10,5 +10,4 @@ export interface Booking {
   _id: string;
   date: string;
   timeSlot: string;
-  isBooked: boolean;
 }
