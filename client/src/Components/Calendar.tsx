@@ -2,28 +2,37 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { apiPrivate } from "../services/api";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../services/types";
 import { formatTime } from "../services/helper";
 import { toast } from "react-toastify";
+import useAxiosPrivate from "../customHooks/usePrivateRoute";
+import { logout } from "../features/auth/authSlice";
+import { useNavigate } from "react-router-dom";
 
 const Calendar: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [bookedSlots, setBookedSlots] = useState<{ [date: string]: string[] }>(
     {}
   );
+  const axiosPrivate = useAxiosPrivate();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const { id } = useSelector((state: RootState) => state.auth);
   useEffect(() => {
-    apiPrivate
-      .get("api/appointments/booked-slots")
+    axiosPrivate
+      .get("api/appointments/booked-slots", { withCredentials: true })
       .then((response) => {
         setBookedSlots(response.data);
       })
       .catch((error) => {
         console.error("Failed to fetch booked slots:", error);
+        dispatch(logout());
+        navigate("/login");
       });
-  }, [selectedDate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [axiosPrivate, selectedDate]);
 
   const handleDateChange = (date: Date) => {
     setSelectedDate(date);
@@ -45,7 +54,7 @@ const Calendar: React.FC = () => {
       !bookedSlots[selectedDate.toISOString().slice(0, 10)]?.includes(timeSlot)
     ) {
       const toastId = toast.loading("Loading...");
-      apiPrivate
+      axiosPrivate
         .post("api/appointments/book-slot", {
           date: selectedDate.toISOString().slice(0, 10),
           timeSlot,

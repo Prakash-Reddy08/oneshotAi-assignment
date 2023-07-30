@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { apiPrivate } from "../services/api";
 import { useSelector } from "react-redux";
 import { Booking, RootState } from "../services/types";
 import { formatTime } from "../services/helper";
 import { toast } from "react-toastify";
+import useAxiosPrivate from "../customHooks/usePrivateRoute";
 
 const Appointments: React.FC = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const { id } = useSelector((state: RootState) => state.auth);
+  const axiosPrivate = useAxiosPrivate();
+
   useEffect(() => {
-    apiPrivate
+    axiosPrivate
       .get(`api/appointments/user-bookings/${id}`)
       .then((response) => {
         setBookings(response.data);
@@ -18,11 +20,12 @@ const Appointments: React.FC = () => {
       .catch((error) => {
         console.error("Failed to fetch user bookings:", error);
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const handleCancelBooking = (bookingId: string) => {
     const toastId = toast.loading("Loading...");
-    apiPrivate
+    axiosPrivate
       .delete(`api/appointments/cancel-booking/${bookingId}`)
       .then(() => {
         setBookings((prevBookings) =>

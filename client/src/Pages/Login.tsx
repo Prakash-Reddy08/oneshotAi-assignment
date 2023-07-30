@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { styled } from "styled-components";
-import { api, apiPrivate } from "../services/api";
+import { api } from "../services/api";
 import { toast } from "react-toastify";
 import Loading from "../Components/Loading";
 import { useDispatch, useSelector } from "react-redux";
@@ -60,8 +60,15 @@ const Login: React.FC = () => {
       toast.info("Server may take 30 seconds to respond");
     }, 3000);
 
-    apiPrivate
-      .post("/api/auth/verify-otp", { email, otp })
+    api
+      .post(
+        "/api/auth/verify-otp",
+        { email, otp },
+        {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
+        }
+      )
       .then((response) => {
         const { id, token, email } = response.data;
         dispatch(loginSuccess({ token, email, id }));

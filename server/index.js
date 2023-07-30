@@ -4,6 +4,7 @@ const cors = require('cors');
 const connectDB = require('./database/connectDB');
 const appointmentRoutes = require("./routes/appointmentRoute")
 const authRoutes = require("./routes/authRoute")
+const refreshRoutes = require('./routes/refreshRoute')
 const cookieParser = require("cookie-parser")
 dotenv.config();
 const app = express();
@@ -20,6 +21,7 @@ connectDB()
 
 app.use('/api/auth', authRoutes);
 app.use('/api/appointments', appointmentRoutes);
+app.use('/refresh', refreshRoutes)
 
 app.use((req, res) => {
     res.status(404).json({ error: 'Not Found' });
