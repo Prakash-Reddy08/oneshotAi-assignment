@@ -23,7 +23,8 @@ exports.getBookedSlots = async (req, res) => {
 
 exports.bookSlot = async (req, res) => {
     try {
-        const { date, timeSlot, userId } = req.body;
+        const { date, timeSlot } = req.body;
+        const userId = req.user.id
         if (!date || !timeSlot || !userId) {
             return res.status(400).json({ error: "Something Went Wrong" })
         }
@@ -44,9 +45,9 @@ exports.bookSlot = async (req, res) => {
 
 exports.getUserBookings = async (req, res) => {
     try {
-        const { userId } = req.params;
+        const { id } = req.user;
 
-        const bookings = await Appointment.find({ bookedBy: userId });
+        const bookings = await Appointment.find({ bookedBy: id });
 
         res.json(bookings);
     } catch (err) {
@@ -64,7 +65,9 @@ exports.cancelBooking = async (req, res) => {
         if (!booking) {
             return res.status(404).json({ error: 'Booking not found' });
         }
-
+        if (booking.bookedBy.toString() !== req.user.id) {
+            return res.status(403).json({ error: "Unauthorized" })
+        }
         await Appointment.deleteOne({ _id: bookingId });
 
         res.json({ message: 'Booking cancelled successfully' });
